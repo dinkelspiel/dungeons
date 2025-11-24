@@ -1,4 +1,4 @@
-package dev.keii.dungeons.utilities;
+package dev.keii.dungeons.util;
 
 import java.util.Map;
 import java.util.UUID;

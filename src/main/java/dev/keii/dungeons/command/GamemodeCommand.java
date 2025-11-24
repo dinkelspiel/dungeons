@@ -1,7 +1,6 @@
-package dev.keii.dungeons.commands;
+package dev.keii.dungeons.command;
 
 import net.kyori.adventure.text.Component;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.entity.GameMode;

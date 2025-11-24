@@ -31,7 +31,7 @@ java {
 tasks {
     jar {
         manifest {
-            attributes["Main-Class"] = "dev.keii.dungeons.Main"
+            attributes["Main-Class"] = "dev.keii.dungeons.Dungeons"
         }
     }
 
