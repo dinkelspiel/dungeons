@@ -33,14 +33,6 @@ public class TraitThwomp extends ActiveTrait {
 
     @Override
     public void onUse(ItemUseContext ctx) {
-        if (ctx.entity().isOnGround()) {
-            SoundUtil.playInRadius(ctx.entity().getInstance(), ctx.entity().getPosition(),
-                    SoundEvent.BLOCK_NOTE_BLOCK_BASS);
-            ctx.audience().sendMessage(MessageFormatter.error("You must use this ability in the air"));
-            return;
-        }
-
-        ctx.entity().setVelocity(ctx.entity().getVelocity().mul(0.1));
         StatusEffectComponent statusEffectComponent = ctx.actor().getComponent(StatusEffectComponent.class);
         if (statusEffectComponent == null)
             return;

@@ -34,6 +34,7 @@ public class VisualComponent implements ActorComponent {
 
         Vec offset = new Vec(state.getScale().x() * 0.5, 0, -state.getScale().z() * 0.5);
         entity.teleport(ctx.position().withDirection(new Vec(90, 0, 0)).sub(offset));
+        entity.setVelocity(ctx.entity().getVelocity());
     }
 
     @Override

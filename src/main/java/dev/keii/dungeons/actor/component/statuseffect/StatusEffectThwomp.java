@@ -1,10 +1,15 @@
 package dev.keii.dungeons.actor.component.statuseffect;
 
+import dev.keii.dungeons.actor.ActorComponent;
 import dev.keii.dungeons.actor.ActorHolder;
 import dev.keii.dungeons.actor.component.StatusEffectComponent;
 import dev.keii.dungeons.actor.component.VisualComponent;
 import dev.keii.dungeons.actor.component.visual.VisualState;
 import dev.keii.dungeons.util.SoundUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent.Builder;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
@@ -13,6 +18,7 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.ParticlePacket;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.utils.time.TimeUnit;
 
 public class StatusEffectThwomp implements StatusEffect {
     VisualComponent visualComponent;
@@ -30,9 +36,15 @@ public class StatusEffectThwomp implements StatusEffect {
         visualComponent = new VisualComponent(new VisualState(Block.ANVIL, new Vec(2, 2, 2)));
         ctx.actor().addComponent(visualComponent);
 
-        // TODO: make this into a generic component so two status effects don't
-        // overwrite eachother, maybe make it a part of ActorStats
-        livingEntity.getAttribute(Attribute.GRAVITY).setBaseValue(0.32);
+        livingEntity.getAttribute(Attribute.GRAVITY).setBaseValue(0.04);
+        ctx.entity().setVelocity(ctx.entity().getVelocity().mul(0.1).withY(15));
+
+        // I delay the gravity increase so the thwomp has a bit of airtime
+        MinecraftServer.getSchedulerManager().buildTask(() -> {
+            // TODO: make this into a generic component so two status effects don't
+            // overwrite eachother, maybe make it a part of ActorStats
+            livingEntity.getAttribute(Attribute.GRAVITY).setBaseValue(0.32);
+        }).delay(10, TimeUnit.SERVER_TICK).schedule();
     }
 
     @Override
@@ -78,5 +90,10 @@ public class StatusEffectThwomp implements StatusEffect {
                 }
             }
         }
+    }
+
+    @Override
+    public void onBuildTitle(StatusEffectContext ctx, Builder builder) {
+        builder.append(Component.text("Thwomp", NamedTextColor.DARK_RED));
     }
 }
