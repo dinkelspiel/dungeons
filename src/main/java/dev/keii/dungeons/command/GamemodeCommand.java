@@ -1,6 +1,6 @@
 package dev.keii.dungeons.command;
 
-import net.kyori.adventure.text.Component;
+import dev.keii.dungeons.util.MessageFormatter;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.entity.GameMode;
@@ -24,24 +24,24 @@ public class GamemodeCommand extends Command {
 
             Player target = finder.findFirstPlayer(sender);
             if (target == null) {
-                sender.sendMessage(Component.text("Player not found or not online."));
+                sender.sendMessage(MessageFormatter.error("Player not found or not online."));
                 return;
             }
             target.setGameMode(gameMode);
 
-            sender.sendMessage(Component.text("Set " + target.getUsername() + " to " + gameMode));
+            sender.sendMessage(MessageFormatter.error("Set {} to {}", target.getUsername(), gameMode));
         }, gameModeArgument, playerArgument);
 
         addSyntax((sender, context) -> {
             final GameMode gameMode = context.get(gameModeArgument);
 
             if (!(sender instanceof Player player)) {
-                sender.sendMessage(Component.text("Only players can run this without a target."));
+                sender.sendMessage(MessageFormatter.error("Only players can run this without a target."));
                 return;
             }
 
             player.setGameMode(gameMode);
-            sender.sendMessage(Component.text("Set your gamemode to " + gameMode));
+            sender.sendMessage(MessageFormatter.success("Set your gamemode to {}", gameMode));
         }, gameModeArgument);
     }
 }

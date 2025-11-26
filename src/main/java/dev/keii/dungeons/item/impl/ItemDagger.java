@@ -5,10 +5,12 @@ import java.util.List;
 import dev.keii.dungeons.item.api.Item;
 import dev.keii.dungeons.item.api.ItemComponent;
 import dev.keii.dungeons.item.api.ItemRarity;
-import dev.keii.dungeons.item.api.component.ModifierComponent;
+import dev.keii.dungeons.item.api.component.TraitComponent;
 import dev.keii.dungeons.item.api.component.WeaponComponent;
-import dev.keii.dungeons.item.api.component.modifier.ModifierFireAspect;
-import dev.keii.dungeons.item.api.component.modifier.ModifierSharpness;
+import dev.keii.dungeons.item.api.component.trait.TraitMajesticLeap;
+import dev.keii.dungeons.item.api.component.trait.TraitMeleeLiftsteal;
+import dev.keii.dungeons.item.api.component.trait.TraitFireAspect;
+import dev.keii.dungeons.item.api.component.trait.TraitSharpness;
 import net.minestom.server.item.Material;
 
 public class ItemDagger extends Item {
@@ -36,6 +38,7 @@ public class ItemDagger extends Item {
     public List<ItemComponent> components() {
         return List.of(
                 new WeaponComponent(10),
-                new ModifierComponent(List.of(new ModifierSharpness(), new ModifierFireAspect())));
+                new TraitComponent(List.of(new TraitSharpness(), new TraitFireAspect(), new TraitMajesticLeap(),
+                        new TraitMeleeLiftsteal())));
     }
 }

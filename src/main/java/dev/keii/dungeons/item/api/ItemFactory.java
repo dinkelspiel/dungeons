@@ -38,6 +38,7 @@ public final class ItemFactory {
 
         for (ItemComponent component : item.components()) {
             component.onBuildLore(null, lore);
+            lore.add(Component.text(""));
         }
 
         ItemStack itemStack = ItemStack.builder(item.material())

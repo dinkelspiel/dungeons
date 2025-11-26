@@ -1,5 +1,7 @@
 package dev.keii.dungeons.actor.component.statuseffect;
 
+import net.kyori.adventure.text.TextComponent;
+
 public interface StatusEffect {
     /**
      * If a StatusEffect on an Actor exists of this type already should they stack
@@ -16,6 +18,9 @@ public interface StatusEffect {
     }
 
     default void onRemove(StatusEffectContext ctx) {
+    }
+
+    default void onBuildTitle(StatusEffectContext ctx, TextComponent.Builder builder) {
     }
 
     default double onIncomingDamage(StatusEffectContext ctx, StatusEffectContext src, double amount) {

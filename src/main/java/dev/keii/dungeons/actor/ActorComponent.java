@@ -1,5 +1,7 @@
 package dev.keii.dungeons.actor;
 
+import net.kyori.adventure.text.TextComponent;
+
 public interface ActorComponent {
     default void onSpawn(ActorContext ctx) {
     }
@@ -14,5 +16,14 @@ public interface ActorComponent {
     }
 
     default void onInteract(ActorContext ctx, ActorContext player) {
+    }
+
+    default void onBuildTitle(ActorContext ctx, TextComponent.Builder title) {
+    }
+
+    default void onApply(ActorContext ctx) {
+    }
+
+    default void onRemove(ActorContext ctx) {
     }
 }

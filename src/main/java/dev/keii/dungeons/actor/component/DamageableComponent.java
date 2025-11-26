@@ -1,25 +1,17 @@
 package dev.keii.dungeons.actor.component;
 
-import java.util.UUID;
+import java.util.Optional;
 
 import dev.keii.dungeons.actor.ActorComponent;
 import dev.keii.dungeons.actor.ActorContext;
 import dev.keii.dungeons.item.api.Item;
 import dev.keii.dungeons.item.api.ItemStatResolver;
 import dev.keii.dungeons.item.api.ItemStats;
-import dev.keii.dungeons.item.api.ItemTags;
-import dev.keii.dungeons.item.dao.GameItemInstanceDao;
 import dev.keii.dungeons.item.model.GameItemInstance;
-import dev.keii.dungeons.npc.Npc;
 import dev.keii.dungeons.util.SoundUtil;
 import lombok.Getter;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.LivingEntity;
-import net.minestom.server.entity.damage.Damage;
-import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.item.ItemStack;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.utils.time.TimeUnit;
 
 public class DamageableComponent implements ActorComponent {
     long last = System.currentTimeMillis();
@@ -53,27 +45,18 @@ public class DamageableComponent implements ActorComponent {
             return;
         }
 
-        HealthComponent healthComponent = ctx.actor().getComponent(HealthComponent.class);
-
         double damage = 0;
-        if (attacker.entity() instanceof LivingEntity entity) {
-            // Find the id for the held item
-            ItemStack itemStack = entity.getItemInMainHand();
-            if (itemStack == null) {
-                return;
-            }
-            String itemId = itemStack.getTag(ItemTags.ID);
 
-            // Get the actual referenced item
-            GameItemInstanceDao dao = new GameItemInstanceDao();
-            GameItemInstance gameItemInstance = dao.findById(UUID.fromString(itemId));
-            if (gameItemInstance == null) {
+        if (attacker.entity() instanceof LivingEntity _) {
+            // Find the id for the held item
+            Optional<GameItemInstance> gameItemInstance = attacker.actor().getItemInMainHand();
+            if (gameItemInstance.isEmpty()) {
                 return;
             }
-            Item item = gameItemInstance.getItem();
+            Item item = gameItemInstance.get().getItem();
 
             // Send the attack to the item
-            item.onAttack(attacker.actor(), ctx.actor());
+            item.onAttackEntity(attacker.actor(), ctx.actor());
 
             // Calculate the damage
             ItemStatResolver statResolver = new ItemStatResolver();
@@ -81,34 +64,7 @@ public class DamageableComponent implements ActorComponent {
             damage = stats.getDamage();
         }
 
-        if (healthComponent != null) {
-            healthComponent.setHealth(healthComponent.getHealth() - (float) damage);
-        }
-
-        if (ctx.entity() instanceof LivingEntity entity) {
-            entity.damage(new Damage(DamageType.GENERIC, entity, attacker.entity(), attacker.position(), 0));
-
-            entity.takeKnockback(0.4f, Math.sin(attacker.entity().getPosition().yaw() * (Math.PI / 180)),
-                    -Math.cos(attacker.entity().getPosition().yaw() * (Math.PI / 180)));
-
-            if (healthComponent.getHealth() <= 0) {
-                entity.kill();
-            }
-        }
-
-        if (ctx.entity() instanceof Npc npc) {
-            npc.setCustomName();
-        }
-
-        if (healthComponent.getHealth() <= 0) {
-            playSoundDeath(ctx);
-
-            MinecraftServer.getSchedulerManager().buildTask(() -> {
-                ctx.entity().remove();
-            }).delay(15, TimeUnit.SERVER_TICK).schedule();
-        } else {
-            playSoundDamaged(ctx);
-        }
+        ctx.actor().damage(attacker.actor(), damage);
 
         last = System.currentTimeMillis();
     }

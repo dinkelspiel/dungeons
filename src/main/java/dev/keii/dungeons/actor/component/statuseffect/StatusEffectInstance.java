@@ -9,9 +9,9 @@ public final class StatusEffectInstance {
     private final Actor actor;
     @Getter
     @Setter
-    private double remaining; // seconds
+    private Double remaining; // seconds
 
-    public StatusEffectInstance(StatusEffect effect, Actor actor, double durationSeconds) {
+    public StatusEffectInstance(StatusEffect effect, Actor actor, Double durationSeconds) {
         this.effect = effect;
         this.actor = actor;
         this.remaining = durationSeconds;
@@ -21,11 +21,18 @@ public final class StatusEffectInstance {
         return effect;
     }
 
+    public boolean isIndefinete() {
+        return remaining == null;
+    }
+
     public boolean isExpired() {
         return remaining <= 0;
     }
 
     public void tick() {
+        if (remaining == null)
+            return;
+
         // Minecraft tickrate
         remaining -= 1f / 20f;
     }

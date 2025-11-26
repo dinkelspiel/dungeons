@@ -10,6 +10,9 @@ import dev.keii.dungeons.actor.ActorContext;
 import dev.keii.dungeons.actor.component.statuseffect.StatusEffect;
 import dev.keii.dungeons.actor.component.statuseffect.StatusEffectContext;
 import dev.keii.dungeons.actor.component.statuseffect.StatusEffectInstance;
+import dev.keii.dungeons.npc.Npc;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 public class StatusEffectComponent implements ActorComponent {
     private Actor ctx;
@@ -20,17 +23,30 @@ public class StatusEffectComponent implements ActorComponent {
 
     private final List<StatusEffectInstance> active = new ArrayList<>();
 
+    /**
+     * A durationSeconds of -1 makes the effect indefinite. A helper method called
+     * addIndefinete is also provided.
+     */
     public void add(StatusEffect effect, double durationSeconds) {
         if (!effect.isStacking() && has(effect.getClass())) {
             StatusEffectInstance instance = get(effect.getClass());
-            instance.setRemaining(durationSeconds);
+            instance.setRemaining(durationSeconds == -1 ? null : durationSeconds);
             return;
         }
 
         // handle stacking / refreshing
-        var inst = new StatusEffectInstance(effect, ctx, durationSeconds);
+        var inst = new StatusEffectInstance(effect, ctx, durationSeconds == -1 ? null : durationSeconds);
         active.add(inst);
         effect.onApply(inst.ctx());
+    }
+
+    public void addIndefinete(StatusEffect effect) {
+        add(effect, -1);
+    }
+
+    public void remove(StatusEffectInstance instance) {
+        instance.effect().onRemove(instance.ctx());
+        active.remove(instance);
     }
 
     public boolean has(Class<? extends StatusEffect> type) {
@@ -49,15 +65,18 @@ public class StatusEffectComponent implements ActorComponent {
     public void onTick(ActorContext ctx, long time) {
         var it = active.iterator();
         while (it.hasNext()) {
-
             var inst = it.next();
             inst.tick();
 
             inst.effect().onTick(inst.ctx());
 
-            if (inst.isExpired()) {
+            if (!inst.isIndefinete() && inst.isExpired()) {
                 inst.effect().onRemove(inst.ctx());
                 it.remove();
+            }
+
+            if (ctx.entity() instanceof Npc npc) {
+                npc.setCustomName();
             }
         }
     }
@@ -68,5 +87,15 @@ public class StatusEffectComponent implements ActorComponent {
             out = inst.effect().onIncomingDamage(inst.ctx(), src, out);
         }
         return out;
+    }
+
+    @Override
+    public void onBuildTitle(ActorContext ctx, TextComponent.Builder builder) {
+        for (StatusEffectInstance statusEffectInstance : active) {
+            builder.append(Component.text(" "));
+
+            statusEffectInstance.effect().onBuildTitle(new StatusEffectContext(ctx.actor(), statusEffectInstance),
+                    builder);
+        }
     }
 }

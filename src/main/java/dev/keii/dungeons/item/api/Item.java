@@ -32,9 +32,9 @@ public abstract class Item implements ComponentContainer<ItemComponent> {
         return getComponent(type) != null;
     }
 
-    public void onAttack(Actor actor, Actor target) {
+    public void onAttackEntity(Actor actor, Actor target) {
         for (ItemComponent component : components()) {
-            component.onAttack(new ItemAttackContext(this, actor, target));
+            component.onAttackEntity(new ItemAttackContext(this, actor, target));
         }
     }
 }
