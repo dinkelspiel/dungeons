@@ -1,11 +1,12 @@
 package dev.keii.dungeons.item.api.component.trait;
 
+import java.text.DecimalFormat;
+
 import dev.keii.dungeons.actor.component.ActorStatsComponent;
 import dev.keii.dungeons.actor.component.stats.ActorStats;
 import dev.keii.dungeons.item.context.ItemContext;
 import dev.keii.dungeons.util.MessageFormatter;
 import dev.keii.dungeons.util.SoundUtil;
-import net.kyori.adventure.text.Component;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.tag.Tag;
 
@@ -24,7 +25,10 @@ public abstract class ActiveTrait implements ItemTrait {
             // still on cooldown
             SoundUtil.playInRadius(ctx.entity().getInstance(), ctx.entity().getPosition(),
                     SoundEvent.BLOCK_NOTE_BLOCK_BASS);
-            ctx.audience().sendMessage(MessageFormatter.error("You can use this active in {}s", expires - now));
+            DecimalFormat df = new DecimalFormat("#.#");
+            ctx.audience().sendMessage(
+                    MessageFormatter.error("You can use this active in {}s",
+                            df.format((float) (expires - now) / 1000f)));
             return false;
         }
         return true;

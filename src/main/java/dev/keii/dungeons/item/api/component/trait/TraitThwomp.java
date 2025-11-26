@@ -3,11 +3,8 @@ package dev.keii.dungeons.item.api.component.trait;
 import dev.keii.dungeons.actor.component.StatusEffectComponent;
 import dev.keii.dungeons.actor.component.statuseffect.StatusEffectThwomp;
 import dev.keii.dungeons.item.context.ItemUseContext;
-import dev.keii.dungeons.util.MessageFormatter;
-import dev.keii.dungeons.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minestom.server.sound.SoundEvent;
 
 public class TraitThwomp extends ActiveTrait {
 
@@ -33,6 +30,11 @@ public class TraitThwomp extends ActiveTrait {
 
     @Override
     public void onUse(ItemUseContext ctx) {
+        if (!canActivate(ctx))
+            return;
+
+        activated(ctx);
+
         StatusEffectComponent statusEffectComponent = ctx.actor().getComponent(StatusEffectComponent.class);
         if (statusEffectComponent == null)
             return;

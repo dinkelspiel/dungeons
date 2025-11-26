@@ -1,6 +1,5 @@
 package dev.keii.dungeons.actor.component.statuseffect;
 
-import dev.keii.dungeons.actor.ActorComponent;
 import dev.keii.dungeons.actor.ActorHolder;
 import dev.keii.dungeons.actor.component.StatusEffectComponent;
 import dev.keii.dungeons.actor.component.VisualComponent;

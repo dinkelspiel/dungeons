@@ -35,6 +35,7 @@ public final class Actor implements ComponentContainer<ActorComponent> {
     private final Entity entity;
     private final Map<Class<? extends ActorComponent>, ActorComponent> components = new HashMap<>();
     private final List<ActorComponent> componentList = new ArrayList<>();
+    private final List<ActorComponent> componentsToRemove = new ArrayList<>();
     private boolean wasOnGroundLastTick = true;
     @Getter
     private boolean justLanded = false;
@@ -84,9 +85,7 @@ public final class Actor implements ComponentContainer<ActorComponent> {
      * Remove the component by reference not by type
      */
     public <T extends ActorComponent> void removeComponent(T component) {
-        component.onRemove(new ActorContext(this));
-        components.remove(component.getClass(), component);
-        componentList.remove(component);
+        componentsToRemove.add(component);
     }
 
     public List<ActorComponent> components() {
@@ -107,6 +106,13 @@ public final class Actor implements ComponentContainer<ActorComponent> {
         for (ActorComponent component : components()) {
             component.onTick(new ActorContext(this), time);
         }
+
+        for (ActorComponent component : componentsToRemove) {
+            component.onRemove(new ActorContext(this));
+            components.remove(component.getClass(), component);
+            componentList.remove(component);
+        }
+        componentsToRemove.clear();
 
         justLanded = entity.isOnGround() && !wasOnGroundLastTick;
 
@@ -201,22 +207,10 @@ public final class Actor implements ComponentContainer<ActorComponent> {
             entity.kill();
 
             MinecraftServer.getSchedulerManager().buildTask(() -> {
-                ctx.entity().remove();
-
-                for (ActorComponent c : componentList) {
-                    c.onRemove(ctx);
-                }
-                componentList.clear();
-                components.clear();
+                remove();
             }).delay(15, TimeUnit.SERVER_TICK).schedule();
         } else {
-            ctx.entity().remove();
-
-            for (ActorComponent c : componentList) {
-                c.onRemove(ctx);
-            }
-            componentList.clear();
-            components.clear();
+            remove();
         }
     }
 

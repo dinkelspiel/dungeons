@@ -22,6 +22,7 @@ public class StatusEffectComponent implements ActorComponent {
     }
 
     private final List<StatusEffectInstance> active = new ArrayList<>();
+    private final List<StatusEffectInstance> activesToRemove = new ArrayList<>();
 
     /**
      * A durationSeconds of -1 makes the effect indefinite. A helper method called
@@ -45,8 +46,7 @@ public class StatusEffectComponent implements ActorComponent {
     }
 
     public void remove(StatusEffectInstance instance) {
-        instance.effect().onRemove(instance.ctx());
-        active.remove(instance);
+        activesToRemove.add(instance);
     }
 
     public boolean has(Class<? extends StatusEffect> type) {
@@ -79,6 +79,14 @@ public class StatusEffectComponent implements ActorComponent {
                 npc.setCustomName();
             }
         }
+
+        // This is required to not have a ConcurrentModificationException when removing
+        // status effects in the iterator
+        for (var inst : activesToRemove) {
+            inst.effect().onRemove(inst.ctx());
+            active.remove(inst);
+        }
+        activesToRemove.clear();
     }
 
     public double modifyIncomingDamage(StatusEffectContext ctx, StatusEffectContext src, double amount) {

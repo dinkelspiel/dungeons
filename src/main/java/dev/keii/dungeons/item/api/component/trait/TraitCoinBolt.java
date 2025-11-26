@@ -31,6 +31,11 @@ public class TraitCoinBolt extends ActiveTrait {
 
     @Override
     public void onUse(ItemUseContext ctx) {
+        if (!canActivate(ctx))
+            return;
+
+        activated(ctx);
+
         NpcCoinBolt npc = ctx.actor().getData("trait_coin_bolt_npc", NpcCoinBolt.class);
         if (npc != null) {
             SoundUtil.playInRadius(ctx.entity().getInstance(), ctx.entity().getPosition(),
