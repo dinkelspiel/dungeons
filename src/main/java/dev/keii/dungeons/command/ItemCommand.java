@@ -17,8 +17,6 @@ public class ItemCommand extends Command {
     public ItemCommand() {
         super("item");
 
-        ItemFactory itemFactory = new ItemFactory();
-
         setDefaultExecutor((sender, context) -> {
             sender.sendMessage("You executed the command");
         });
@@ -33,7 +31,7 @@ public class ItemCommand extends Command {
         addSyntax((sender, context) -> {
             final String itemQuery = context.get(itemArgument);
 
-            Optional<GameItemInstance> instance = itemFactory.createInstance(itemQuery);
+            Optional<GameItemInstance> instance = ItemFactory.createInstance(itemQuery);
 
             if (instance.isEmpty()) {
                 sender.sendMessage(MessageFormatter.error("Item '{}' not found in registry.", itemQuery));
@@ -41,7 +39,7 @@ public class ItemCommand extends Command {
             }
 
             if (sender instanceof Player player) {
-                ItemStack itemStack = itemFactory.createItemStack(instance.get());
+                ItemStack itemStack = ItemFactory.createItemStack(instance.get());
 
                 player.getInventory().addItemStack(itemStack);
             }

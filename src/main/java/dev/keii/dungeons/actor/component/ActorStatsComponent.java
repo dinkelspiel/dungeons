@@ -9,6 +9,7 @@ import dev.keii.dungeons.actor.Actor;
 import dev.keii.dungeons.actor.ActorComponent;
 import dev.keii.dungeons.actor.component.stats.ActorStats;
 import dev.keii.dungeons.item.api.Item;
+import dev.keii.dungeons.item.api.ItemFactory;
 import dev.keii.dungeons.item.api.component.TraitComponent;
 import dev.keii.dungeons.item.api.component.trait.ItemTrait;
 import dev.keii.dungeons.item.api.component.trait.PassiveTrait;
@@ -38,7 +39,7 @@ public class ActorStatsComponent implements ActorComponent {
         itemStacks.add(player.getItemInMainHand());
 
         for (ItemStack stack : itemStacks) {
-            Optional<GameItemInstance> inst = actor.getItem(stack);
+            Optional<GameItemInstance> inst = ItemFactory.fromItemStack(stack);
 
             if (inst.isEmpty())
                 continue;

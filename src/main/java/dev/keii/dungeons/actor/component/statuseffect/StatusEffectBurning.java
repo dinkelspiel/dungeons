@@ -1,6 +1,7 @@
 package dev.keii.dungeons.actor.component.statuseffect;
 
 import dev.keii.dungeons.actor.Actor;
+import dev.keii.dungeons.common.DamageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent.Builder;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -21,7 +22,7 @@ public class StatusEffectBurning implements StatusEffect {
             return;
 
         if (ticksSinceFireTick >= ticksBetweenFireTick) {
-            ctx.actor().damage(source, 2);
+            ctx.actor().damage(source, 2, DamageType.MAGIC);
             ticksSinceFireTick = 0;
         }
         ticksSinceFireTick++;

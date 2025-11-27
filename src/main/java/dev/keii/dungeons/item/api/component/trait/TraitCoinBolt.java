@@ -2,6 +2,7 @@ package dev.keii.dungeons.item.api.component.trait;
 
 import dev.keii.dungeons.actor.Actor;
 import dev.keii.dungeons.actor.ActorHolder;
+import dev.keii.dungeons.common.DamageType;
 import dev.keii.dungeons.item.context.ItemContext;
 import dev.keii.dungeons.item.context.ItemUseContext;
 import dev.keii.dungeons.npc.NpcCoinBolt;
@@ -83,7 +84,7 @@ public class TraitCoinBolt extends ActiveTrait {
                 if (actor.getId().equals(ctx.actor().getId()))
                     continue;
 
-                actor.damage(ctx.actor(), 15.0);
+                actor.damage(ctx.actor(), 15.0, DamageType.MAGIC);
 
                 Lightning.strike(actor.getEntity().getPosition(), false);
             }

@@ -10,6 +10,7 @@ import dev.keii.dungeons.actor.component.DamageableComponent;
 import dev.keii.dungeons.actor.component.HealthComponent;
 import dev.keii.dungeons.actor.component.StatusEffectComponent;
 import dev.keii.dungeons.item.api.Item;
+import dev.keii.dungeons.item.api.ItemFactory;
 import dev.keii.dungeons.item.context.ItemContext;
 import dev.keii.dungeons.item.model.GameItemInstance;
 import lombok.Getter;
@@ -43,7 +44,7 @@ public class DungeonsPlayer extends Player implements ActorHolder {
 
         if (actor.isJustLanded()) {
             for (ItemStack itemStack : getInventory().getItemStacks()) {
-                Optional<GameItemInstance> instance = actor.getItem(itemStack);
+                Optional<GameItemInstance> instance = ItemFactory.fromItemStack(itemStack);
                 if (instance.isPresent()) {
                     Item item = instance.get().getItem();
                     item.components().stream().forEach(component -> {

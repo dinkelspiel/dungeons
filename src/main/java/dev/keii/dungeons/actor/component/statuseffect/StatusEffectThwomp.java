@@ -4,6 +4,7 @@ import dev.keii.dungeons.actor.ActorHolder;
 import dev.keii.dungeons.actor.component.StatusEffectComponent;
 import dev.keii.dungeons.actor.component.VisualComponent;
 import dev.keii.dungeons.actor.component.visual.VisualState;
+import dev.keii.dungeons.common.DamageType;
 import dev.keii.dungeons.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent.Builder;
@@ -81,7 +82,7 @@ public class StatusEffectThwomp implements StatusEffect {
                 if (actor.getActor().getId().equals(ctx.actor().getId()))
                     continue;
 
-                actor.getActor().damage(ctx.actor(), 10.0);
+                actor.getActor().damage(ctx.actor(), 10.0, DamageType.MAGIC);
                 StatusEffectComponent statusEffectComponent = actor.getActor()
                         .getComponent(StatusEffectComponent.class);
                 if (statusEffectComponent != null) {

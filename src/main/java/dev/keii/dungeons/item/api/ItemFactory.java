@@ -3,6 +3,7 @@ package dev.keii.dungeons.item.api;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import dev.keii.dungeons.Dungeons;
 import dev.keii.dungeons.item.dao.GameItemInstanceDao;
@@ -12,13 +13,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.item.ItemStack;
 
 public final class ItemFactory {
-    GameItemInstanceDao dao;
-
-    public ItemFactory() {
-        this.dao = new GameItemInstanceDao();
-    }
-
-    public Optional<GameItemInstance> createInstance(String definitionKey) {
+    public static Optional<GameItemInstance> createInstance(String definitionKey) {
+        GameItemInstanceDao dao = new GameItemInstanceDao();
         Item item = Dungeons.getItemRegistry().get(definitionKey.toLowerCase());
 
         if (item == null) {
@@ -31,7 +27,31 @@ public final class ItemFactory {
         return Optional.of(instance);
     }
 
-    public ItemStack createItemStack(GameItemInstance instance) {
+    /**
+     * Shorthand to get itemstack as GameItemInstance
+     * 
+     * @param itemStack
+     * @return
+     */
+    public static Optional<GameItemInstance> fromItemStack(ItemStack itemStack) {
+        if (itemStack == null) {
+            return Optional.empty();
+        }
+        String itemId = itemStack.getTag(ItemTags.ID);
+        if (itemId == null) {
+            return Optional.empty();
+        }
+
+        // Get the actual referenced item
+        GameItemInstanceDao dao = new GameItemInstanceDao();
+        GameItemInstance gameItemInstance = dao.findById(UUID.fromString(itemId));
+        if (gameItemInstance == null) {
+            return Optional.empty();
+        }
+        return Optional.of(gameItemInstance);
+    }
+
+    public static ItemStack createItemStack(GameItemInstance instance) {
         Item item = instance.getItem();
 
         List<Component> lore = new ArrayList<>();

@@ -2,24 +2,20 @@ package dev.keii.dungeons.item.api.component.trait;
 
 import java.text.DecimalFormat;
 
+import dev.keii.dungeons.actor.ActorTags;
 import dev.keii.dungeons.actor.component.ActorStatsComponent;
 import dev.keii.dungeons.actor.component.stats.ActorStats;
 import dev.keii.dungeons.item.context.ItemContext;
 import dev.keii.dungeons.util.MessageFormatter;
 import dev.keii.dungeons.util.SoundUtil;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.tag.Tag;
 
 public abstract class ActiveTrait implements ItemTrait {
     public abstract double cooldownSeconds();
 
-    public Tag<Long> cooldownTag() {
-        return Tag.Long("dungeons:cooldown_" + key());
-    }
-
     public boolean canActivate(ItemContext ctx) {
         long now = System.currentTimeMillis();
-        Long expires = ctx.entity().getTag(cooldownTag());
+        Long expires = ctx.entity().getTag(ActorTags.cooldown(key()));
 
         if (expires != null && expires > now) {
             // still on cooldown
@@ -43,6 +39,6 @@ public abstract class ActiveTrait implements ItemTrait {
 
         long now = System.currentTimeMillis();
         long expiryTimestamp = now + (long) (cooldownSeconds * 1000.0);
-        ctx.entity().setTag(cooldownTag(), expiryTimestamp);
+        ctx.entity().setTag(ActorTags.cooldown(key()), expiryTimestamp);
     }
 }

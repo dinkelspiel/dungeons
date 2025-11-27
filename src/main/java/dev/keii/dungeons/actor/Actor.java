@@ -15,8 +15,8 @@ import dev.keii.dungeons.actor.component.HealthComponent;
 import dev.keii.dungeons.actor.component.stats.ActorStats;
 import dev.keii.dungeons.common.ComponentContainer;
 import dev.keii.dungeons.common.DamageResult;
-import dev.keii.dungeons.item.api.ItemTags;
-import dev.keii.dungeons.item.dao.GameItemInstanceDao;
+import dev.keii.dungeons.common.DamageType;
+import dev.keii.dungeons.item.api.ItemFactory;
 import dev.keii.dungeons.item.model.GameItemInstance;
 import dev.keii.dungeons.npc.Npc;
 import lombok.Getter;
@@ -26,7 +26,6 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.damage.Damage;
-import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.utils.time.TimeUnit;
 
@@ -124,7 +123,16 @@ public final class Actor implements ComponentContainer<ActorComponent> {
         return getComponent(type) != null;
     }
 
-    public DamageResult damage(Actor source, double amount) {
+    /**
+     * Deal damage with animation and knockback to the actor
+     * handles components
+     * 
+     * @param source     Nullable source of the damage
+     * @param amount     Amount of damage to deal
+     * @param damageType Type of damage being dealt
+     * @return
+     */
+    public DamageResult damage(Actor source, double amount, DamageType damageType) {
         ActorContext ctx = new ActorContext(this);
         ActorContext srcCtx = source == null ? null : new ActorContext(source);
 
@@ -154,10 +162,11 @@ public final class Actor implements ComponentContainer<ActorComponent> {
         }
 
         if (entity instanceof LivingEntity livingEntity) {
-            livingEntity.damage(new Damage(DamageType.GENERIC, entity, srcCtx != null ? srcCtx.entity() : null,
+            livingEntity.damage(new Damage(net.minestom.server.entity.damage.DamageType.GENERIC, entity,
+                    srcCtx != null ? srcCtx.entity() : null,
                     srcCtx != null ? srcCtx.position() : null, 0));
 
-            if (srcCtx != null) {
+            if (srcCtx != null && damageType.isApplyKnockback()) {
                 livingEntity.takeKnockback(0.4f, Math.sin(srcCtx.entity().getPosition().yaw() * (Math.PI / 180)),
                         -Math.cos(srcCtx.entity().getPosition().yaw() * (Math.PI / 180)));
             }
@@ -214,6 +223,9 @@ public final class Actor implements ComponentContainer<ActorComponent> {
         }
     }
 
+    /**
+     * Remove the actor and their entities without playing a kill animation
+     */
     public void remove() {
         ActorContext ctx = new ActorContext(this);
         entity.remove();
@@ -225,31 +237,18 @@ public final class Actor implements ComponentContainer<ActorComponent> {
         components.clear();
     }
 
+    /**
+     * Shorthand to get the ItemStack in the main hand as a GameItemInstance
+     * 
+     * @return
+     */
     public Optional<GameItemInstance> getItemInMainHand() {
         if (!(getEntity() instanceof LivingEntity entity)) {
             return Optional.empty();
         }
 
         ItemStack itemStack = entity.getItemInMainHand();
-        return getItem(itemStack);
-    }
-
-    public Optional<GameItemInstance> getItem(ItemStack itemStack) {
-        if (itemStack == null) {
-            return Optional.empty();
-        }
-        String itemId = itemStack.getTag(ItemTags.ID);
-        if (itemId == null) {
-            return Optional.empty();
-        }
-
-        // Get the actual referenced item
-        GameItemInstanceDao dao = new GameItemInstanceDao();
-        GameItemInstance gameItemInstance = dao.findById(UUID.fromString(itemId));
-        if (gameItemInstance == null) {
-            return Optional.empty();
-        }
-        return Optional.of(gameItemInstance);
+        return ItemFactory.fromItemStack(itemStack);
     }
 
     public <T> T getData(String key, Class<T> type) {

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import dev.keii.dungeons.actor.ActorComponent;
 import dev.keii.dungeons.actor.ActorContext;
+import dev.keii.dungeons.common.DamageType;
 import dev.keii.dungeons.item.api.Item;
 import dev.keii.dungeons.item.api.ItemStatResolver;
 import dev.keii.dungeons.item.api.ItemStats;
@@ -64,7 +65,7 @@ public class DamageableComponent implements ActorComponent {
             damage = stats.getDamage();
         }
 
-        ctx.actor().damage(attacker.actor(), damage);
+        ctx.actor().damage(attacker.actor(), damage, DamageType.MELEE);
 
         last = System.currentTimeMillis();
     }
